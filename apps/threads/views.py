@@ -1,6 +1,7 @@
 from django.shortcuts import redirect, render, get_object_or_404
 
 from django.db import transaction
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseRedirect, HttpResponseForbidden
 from django.urls import reverse
@@ -14,13 +15,19 @@ from apps.media.models import Photo
 def thread_detail(request, thread_id):
     thread = get_object_or_404(Thread, pk=thread_id)
     if not ThreadParticipant.objects.filter(thread=thread, user=request.user).exists():
-        return HttpResponseForbidden("You are not a participant of this thread!")
+        messages.error(request, "You are not a participant in this thread.")
+        return redirect("home")
 
     base_template = "base.html"
     lost_found_context = None
     skill_exchange_context = None
 
     if request.method == "POST":
+        # if not thread.status == ThreadStatus.OPEN:
+        #     messages.error(
+        #         request, "Thread is closed, you can no longer send messages."
+        #     )
+        #     return redirect("threads:thread_detail", thread_id=thread.id)
         content = request.POST.get("content", "").strip()
         files = request.FILES.getlist("photos")
 
