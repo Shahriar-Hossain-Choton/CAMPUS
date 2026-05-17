@@ -19,7 +19,7 @@ from apps.common.choices import (
     LostAndFoundPostType,
     LostAndFoundStatus,
     ClaimRequestStatus,
-    SuggestedMatchStatus,
+    LFSuggestedMatchStatus,
 )
 from apps.media.models import Photo
 
@@ -355,7 +355,7 @@ def approve_claim(request, post_id, claim_id):
                 SuggestedMatch.objects.filter(
                     lost_post=claim.lost_post,
                     found_post=post,
-                ).update(status=SuggestedMatchStatus.CONVERTED)
+                ).update(status=LFSuggestedMatchStatus.CONVERTED)
 
             # 6. Create the private communication thread
             thread = Thread.objects.create(
@@ -420,7 +420,7 @@ def my_suggested_matches(request):
         SuggestedMatch.objects.filter(
             lost_post__user=request.user,
             lost_post__deleted_at__isnull=True,
-            status=SuggestedMatchStatus.PENDING,
+            status=LFSuggestedMatchStatus.PENDING,
         )
         .select_related("lost_post", "found_post", "found_post__category")
         .prefetch_related("found_post__tags", "found_post__post_photos__photo")
@@ -446,11 +446,11 @@ def dismiss_suggested_match(request, suggestion_id):
         SuggestedMatch,
         pk=suggestion_id,
         lost_post__user=request.user,  # must own the lost post
-        status=SuggestedMatchStatus.PENDING,
+        status=LFSuggestedMatchStatus.PENDING,
     )
 
     if request.method == "POST":
-        suggestion.status = SuggestedMatchStatus.DISMISSED
+        suggestion.status = LFSuggestedMatchStatus.DISMISSED
         suggestion.save(update_fields=["status"])
         messages.info(request, "Suggestion dismissed.")
 

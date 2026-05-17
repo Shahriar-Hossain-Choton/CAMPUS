@@ -4,7 +4,7 @@ from apps.common.choices import (
     LostAndFoundStatus,
     ClaimRequestStatus,
     LostAndFoundPostType,
-    SuggestedMatchStatus,
+    LFSuggestedMatchStatus,
 )
 
 # ---------------------------------------------------------------------------
@@ -216,8 +216,8 @@ class SuggestedMatch(models.Model):
 
     status = models.CharField(
         max_length=20,
-        choices=SuggestedMatchStatus.choices,
-        default=SuggestedMatchStatus.PENDING,
+        choices=LFSuggestedMatchStatus.choices,
+        default=LFSuggestedMatchStatus.PENDING,
     )
 
     created_at = models.DateTimeField(auto_now_add=True)

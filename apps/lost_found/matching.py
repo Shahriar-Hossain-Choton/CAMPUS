@@ -17,7 +17,7 @@ from .models import LostAndFoundPost, SuggestedMatch
 from apps.common.choices import (
     LostAndFoundPostType,
     LostAndFoundStatus,
-    SuggestedMatchStatus,
+    LFSuggestedMatchStatus,
 )
 
 
@@ -80,7 +80,7 @@ def run_auto_match(post: LostAndFoundPost) -> list[SuggestedMatch]:
 
         suggestion, created = SuggestedMatch.objects.get_or_create(
             **kwargs,
-            defaults={"score": score, "status": SuggestedMatchStatus.PENDING},
+            defaults={"score": score, "status": LFSuggestedMatchStatus.PENDING},
         )
 
         if not created and suggestion.score != score:

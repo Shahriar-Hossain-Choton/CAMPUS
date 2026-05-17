@@ -16,7 +16,7 @@ class LostAndFoundStatus(models.TextChoices):
 #     CLOSED = "closed", "Closed"
 
 
-class SuggestedMatchStatus(models.TextChoices):
+class LFSuggestedMatchStatus(models.TextChoices):
     PENDING = "PENDING", "Pending"
     DISMISSED = "DISMISSED", "Dismissed"
     CONVERTED = "CONVERTED", "Converted"
