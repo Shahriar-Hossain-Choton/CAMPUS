@@ -9,210 +9,165 @@
 
 {% block content %}
 
-<div class="lf-header">
-  <div class="lf-header__row">
-    <div>
-      <h1>Edit Profile</h1>
-      <p>Update your information and skills.</p>
-    </div>
-    <a href="{% url 'accounts:profile' handle=profile.user.handle %}" class="btn btn--ghost btn--sm">
-      ← Back to Profile
-    </a>
-  </div>
-</div>
-
-{# Error messages from view #}
-{% if messages %}
-  {% for message in messages %}
-    <div class="message message--{{ message.tags|default:'info' }}" style="margin-bottom: 16px;">
-      {{ message }}
-    </div>
-  {% endfor %}
-{% endif %}
-
-<div style="max-width: 560px;">
-<form method="post"
-      enctype="multipart/form-data"
-      action="{% url 'accounts:edit_profile' profile.user.handle %}"
-      novalidate>
-  {% csrf_token %}
-
-  {# ── Photo ──────────────────────────────────────────────── #}
-  <p class="form-section-title">Profile Photo</p>
-
-  <div class="form-group">
-    <div class="photo-upload-wrap">
-
-      <div class="photo-upload-preview">
-        <img id="e-photoPreviewImg"
-             {% if profile.photo %}src="{{ profile.photo.file.url }}"{% endif %}
-             style="{% if not profile.photo %}display:none;{% endif %}"
-             alt="">
-        <span id="e-photoInitials"
-              {% if profile.photo %}style="display:none"{% endif %}>
-          {{ profile.user.first_name|first|upper }}{{ profile.user.last_name|first|upper }}
-        </span>
+<div class="lf-wrap" style="max-width: 680px;">
+  <div class="lf-header">
+    <div class="lf-header__row">
+      <div>
+        <h1>Edit Profile</h1>
+        <p>Update your information and skills.</p>
       </div>
-
-      <div class="photo-upload-right">
-        <label class="btn-choose-photo" for="e-photoInput">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none"
-               stroke="currentColor" stroke-width="2"
-               stroke-linecap="round" stroke-linejoin="round">
-            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
-            <circle cx="12" cy="13" r="4"/>
-          </svg>
-          Choose photo
-        </label>
-        <input type="file"
-               id="e-photoInput"
-               name="photo"
-               accept="image/jpeg,image/png,image/webp,image/gif"
-               style="display:none"
-               onchange="previewPhoto(this)">
-        <p class="form-help">JPEG, PNG, WebP or GIF · max 5 MB</p>
-        <p class="photo-filename" id="e-photoFilename"></p>
-      </div>
-
+      <a href="{% url 'accounts:profile' handle=profile.user.handle %}" class="btn btn--ghost btn--sm">
+        ← Back to Profile
+      </a>
     </div>
   </div>
+  <form class="card" method="post"
+        enctype="multipart/form-data"
+        action="{% url 'accounts:edit_profile' profile.user.handle %}"
+        novalidate>
+    {% csrf_token %}
 
-  {# ── Personal info ───────────────────────────────────────── #}
-  <p class="form-section-title" style="margin-top: 24px;">Personal Info</p>
-
-  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
-    <div class="form-group">
-      <label for="id_first_name">First Name</label>
-      <input type="text"
-             id="id_first_name"
-             name="first_name"
-             value="{{ profile.user.first_name }}">
-    </div>
-    <div class="form-group">
-      <label for="id_last_name">Last Name</label>
-      <input type="text"
-             id="id_last_name"
-             name="last_name"
-             value="{{ profile.user.last_name }}">
-    </div>
-  </div>
-
-  <div class="form-group">
-    <label for="id_bio">Bio</label>
-    <textarea id="id_bio"
-              name="bio"
-              rows="4"
-              placeholder="Tell others a bit about yourself...">{{ profile.bio }}</textarea>
-  </div>
-
-  {# ── Academic info ───────────────────────────────────────── #}
-  <p class="form-section-title" style="margin-top: 24px;">Academic Info</p>
-
-  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
-    <div class="form-group">
-      <label for="id_student_id">Student ID</label>
-      <input type="text"
-             id="id_student_id"
-             name="student_id"
-             value="{{ profile.student_id|default:'' }}"
-             placeholder="e.g. 0112410041">
-    </div>
+    {# ── Photo ──────────────────────────────────────────────── #}
+    <p class="form-section-title">Profile Photo</p>
 
     <div class="form-group">
-      <label for="id_department">Department</label>
-      <select id="id_department" name="department_id">
-        <option value="">— Not set —</option>
-        {% for dept in all_departments %}
-          <option value="{{ dept.id }}"
-            {% if profile.department_id == dept.id %}selected{% endif %}>
-            {{ dept }} ({{ dept.short_code }})
-          </option>
-        {% endfor %}
-      </select>
-    </div>
-    <div class="form-group">
-      <label for="id_admission_trimester">Admission Trimester</label>
-      <input type="text"
-             id="id_admission_trimester"
-             name="admission_trimester"
-             value="{{ profile.admission_trimester|default:'' }}"
-             placeholder="e.g. 241">
-    </div>
-  </div>
+      <div class="photo-upload-wrap">
 
-  {# ── Skills ──────────────────────────────────────────────── #}
-  <p class="form-section-title" style="margin-top: 24px;">Skills</p>
-
-  <div class="form-group">
-    <label>Your skills</label>
-    <p class="form-help" style="margin-bottom: 8px;">
-      Select from the list below. Search to filter.
-    </p>
-
-    {# Selected chips + hidden inputs rendered here #}
-    <div class="selected-chips" id="e-selectedChips">
-      <span class="chips-placeholder" id="e-chipsPlaceholder"
-            {% if skills %}style="display:none"{% endif %}>
-        None selected — pick from below
-      </span>
-
-      {% for skill in skills %}
-        <span class="selected-chip" data-id="{{ skill.id }}">
-          {{ skill.name }}
-          <button class="chip-remove"
-                  type="button"
-                  onclick="removeSkill('{{ skill.id }}')">×</button>
-        </span>
-      {% endfor %}
-    </div>
-
-    {# Hidden inputs carry the values to the POST — managed by profile.js #}
-    <div id="skill-hidden-inputs">
-      {% for skill in skills %}
-        <input type="hidden" name="skill_ids" value="{{ skill.id }}">
-      {% endfor %}
-    </div>
-
-    {# Search input — visually attached to pool below via border-radius CSS #}
-    <input type="text"
-           id="e-skillSearch"
-           class="form-group input"
-           placeholder="Search skills..."
-           autocomplete="off"
-           style="margin-top: 10px; display: block; width: 100%;
-                  padding: 8px 11px; border: 1.5px solid var(--border-dark);
-                  border-radius: var(--radius) var(--radius) 0 0;
-                  font-family: inherit; font-size: 14px;
-                  outline: none; background: var(--surface); color: var(--text);
-                  border-bottom-color: var(--border);">
-
-    <div class="skills-pool" id="e-skillsPool">
-      {% for skill in all_skills %}
-        <div class="pool-item
-                    {% if skill.id in user_skill_ids %}pool-item--selected{% endif %}"
-             data-id="{{ skill.id }}"
-             data-name="{{ skill.name }}"
-             onclick="addSkill(this)"
-             {% if skill.id in user_skill_ids %}style="display:none"{% endif %}>
-          {{ skill.name }}
+        <div class="photo-upload-preview">
+          <img id="e-photoPreviewImg"
+              {% if profile.photo %}src="{{ profile.photo.file.url }}"{% endif %}
+              style="{% if not profile.photo %}display:none;{% endif %}"
+              alt="">
+          <span id="e-photoInitials"
+                {% if profile.photo %}style="display:none"{% endif %}>
+            {{ profile.user.first_name|first|upper }}{{ profile.user.last_name|first|upper }}
+          </span>
         </div>
-      {% endfor %}
-      <div class="pool-empty" id="e-poolEmpty" style="display:none;">
-        No matching skills
+
+        <div class="photo-upload-right">
+          <label class="btn-choose-photo" for="e-photoInput">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none"
+                stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+              <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+              <circle cx="12" cy="13" r="4"/>
+            </svg>
+            Choose photo
+          </label>
+          <input type="file"
+                id="e-photoInput"
+                name="photo"
+                accept="image/jpeg,image/png,image/webp,image/gif"
+                style="display:none"
+                onchange="previewPhoto(this)">
+          <p class="form-help">JPEG, PNG, WebP or GIF · max 5 MB</p>
+          <p class="photo-filename" id="e-photoFilename"></p>
+        </div>
+
       </div>
     </div>
-  </div>
 
-  {# ── Actions ─────────────────────────────────────────────── #}
-  <hr class="divider">
+    {# ── Personal info ───────────────────────────────────────── #}
+    <p class="form-section-title" style="margin-top: 24px;">Personal Info</p>
 
-  <div class="flex flex-gap-8">
-    <button type="submit" class="btn btn--primary">Save Changes</button>
-    <a href="{% url 'accounts:profile' handle=profile.user.handle %}"
-       class="btn btn--ghost">Cancel</a>
-  </div>
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+      <div class="form-group">
+        <label for="id_first_name">First Name</label>
+        <input type="text"
+              id="id_first_name"
+              name="first_name"
+              value="{{ profile.user.first_name }}">
+      </div>
+      <div class="form-group">
+        <label for="id_last_name">Last Name</label>
+        <input type="text"
+              id="id_last_name"
+              name="last_name"
+              value="{{ profile.user.last_name }}">
+      </div>
+    </div>
 
-</form>
+    <div class="form-group">
+      <label for="id_bio">Bio</label>
+      <textarea id="id_bio"
+                name="bio"
+                rows="4"
+                placeholder="Tell others a bit about yourself...">{{ profile.bio }}</textarea>
+    </div>
+
+    {# ── Skills ──────────────────────────────────────────────── #}
+    <p class="form-section-title" style="margin-top: 24px;">Skills</p>
+
+    <div class="form-group">
+      <label>Your skills</label>
+      <p class="form-help" style="margin-bottom: 8px;">
+        Select from the list below. Search to filter.
+      </p>
+
+      {# Selected chips + hidden inputs rendered here #}
+      <div class="selected-chips" id="e-selectedChips">
+        <span class="chips-placeholder" id="e-chipsPlaceholder"
+              {% if skills %}style="display:none"{% endif %}>
+          None selected — pick from below
+        </span>
+
+        {% for skill in skills %}
+          <span class="selected-chip" data-id="{{ skill.id }}">
+            {{ skill.name }}
+            <button class="chip-remove"
+                    type="button"
+                    onclick="removeSkill('{{ skill.id }}')">×</button>
+          </span>
+        {% endfor %}
+      </div>
+
+      {# Hidden inputs carry the values to the POST — managed by profile.js #}
+      <div id="skill-hidden-inputs">
+        {% for skill in skills %}
+          <input type="hidden" name="skill_ids" value="{{ skill.id }}">
+        {% endfor %}
+      </div>
+
+      {# Search input — visually attached to pool below via border-radius CSS #}
+      <input type="text"
+            id="e-skillSearch"
+            class="form-group input"
+            placeholder="Search skills..."
+            autocomplete="off"
+            style="margin-top: 10px; display: block; width: 100%;
+                    padding: 8px 11px; border: 1.5px solid var(--border-dark);
+                    border-radius: var(--radius) var(--radius) 0 0;
+                    font-family: inherit; font-size: 14px;
+                    outline: none; background: var(--surface); color: var(--text);
+                    border-bottom-color: var(--border);">
+
+      <div class="skills-pool" id="e-skillsPool">
+        {% for skill in all_skills %}
+          <div class="pool-item
+                      {% if skill.id in user_skill_ids %}pool-item--selected{% endif %}"
+              data-id="{{ skill.id }}"
+              data-name="{{ skill.name }}"
+              onclick="addSkill(this)"
+              {% if skill.id in user_skill_ids %}style="display:none"{% endif %}>
+            {{ skill.name }}
+          </div>
+        {% endfor %}
+        <div class="pool-empty" id="e-poolEmpty" style="display:none;">
+          No matching skills
+        </div>
+      </div>
+    </div>
+
+    {# ── Actions ─────────────────────────────────────────────── #}
+    <hr class="divider">
+
+    <div class="flex flex-gap-8">
+      <button type="submit" class="btn btn--primary">Save Changes</button>
+      <a href="{% url 'accounts:profile' handle=profile.user.handle %}"
+        class="btn btn--ghost">Cancel</a>
+    </div>
+
+  </form>
 </div>
 
 {% endblock %}
