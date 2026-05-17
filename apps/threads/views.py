@@ -51,6 +51,7 @@ def thread_detail(request, thread_id):
             )
 
     if hasattr(thread, "claim_thread"):
+        lost_found_context = getattr(thread, "claim_thread")
         base_template = "lost_found/base.html"
     elif hasattr(thread, "exchange_session"):
         skill_exchange_context = getattr(thread, "exchange_session")
