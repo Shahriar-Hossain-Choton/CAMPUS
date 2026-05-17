@@ -25,7 +25,9 @@
 
     <div class="card__meta mb-16">
       <span class="card__meta-item">
-        👤 Posted by <strong>{{ forum_thread.author.handle|default:forum_thread.author.email }}</strong>
+        👤 Posted by <a href="{% url 'accounts:profile' handle=forum_thread.author.handle %}">
+          <strong>{{ forum_thread.author.handle|default:forum_thread.author.email }}</strong>
+        </a>
       </span>
       <span class="card__meta-item">
         📚 {{ forum_thread.department.short_code }} - {{ forum_thread.course.name }}
@@ -71,7 +73,7 @@
   {% endif %}
 
   <section class="forum-message-tree mb-24">
-    {% for message in root_messages %}
+    {% for message in root_thread_messages %}
       {% include "forum/includes/message_node.html" with message=message depth=1 %}
     {% empty %}
       <div class="empty mb-16">

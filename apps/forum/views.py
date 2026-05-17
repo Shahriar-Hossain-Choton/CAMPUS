@@ -1,7 +1,8 @@
 from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 from django.db import transaction
 from django.db.models import F, Q
-from django.http import Http404, JsonResponse
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_POST
 
@@ -119,7 +120,8 @@ def thread_detail(request, pk):
     if base_thread.visibility == ThreadVisibility.PRIVATE:
         is_participant = base_thread.participants.filter(user=request.user).exists()
         if not is_participant and forum_thread.author != request.user:
-            raise Http404("You do not have permission to view this thread.")
+            messages.error(request, "You are not a participant in this thread.")
+            return redirect("forum:index")
 
     # Process new reply submission
     if request.method == "POST":
@@ -138,46 +140,46 @@ def thread_detail(request, pk):
         form = ThreadMessageForm()
 
     # 1. Base queryset for messages
-    messages_qs = base_thread.messages.select_related(
+    thread_messages_qs = base_thread.messages.select_related(
         "sender", "reply_to"
     ).prefetch_related("attachments__photo")
 
     # 2. Identify the Pinned/Accepted Answer
     # We fetch this to display it in a special "Hero" slot at the top of the page.
-    pinned_answer = messages_qs.filter(is_pinned=True).first()
+    pinned_answer = thread_messages_qs.filter(is_pinned=True).first()
 
     # 3. Get sort parameter from URL
     sort_option = request.GET.get("sort", "oldest")
 
     if sort_option == "top":
-        messages = messages_qs.annotate(
+        thread_messages = thread_messages_qs.annotate(
             db_net_score=F("upvote_count") - F("downvote_count")
         ).order_by("-db_net_score", "sent_at")
     elif sort_option == "latest":
-        messages = messages_qs.order_by("-sent_at")
+        thread_messages = thread_messages_qs.order_by("-sent_at")
     else:  # "oldest"
-        messages = messages_qs.order_by("sent_at")
+        thread_messages = thread_messages_qs.order_by("sent_at")
 
     # 4. Build Reddit-style nested tree hierarchy
-    message_dict = {}
-    root_messages = []
+    thread_message_dict = {}
+    root_thread_messages = []
 
     # First pass: load all instances into dictionary
-    for msg in messages:
+    for msg in thread_messages:
         msg.replies_list = []
-        message_dict[msg.id] = msg
+        thread_message_dict[msg.id] = msg
 
     # Second pass: group into parents/roots
-    for msg in messages:
-        if msg.reply_to_id and msg.reply_to_id in message_dict:
-            message_dict[msg.reply_to_id].replies_list.append(msg)
+    for msg in thread_messages:
+        if msg.reply_to_id and msg.reply_to_id in thread_message_dict:
+            thread_message_dict[msg.reply_to_id].replies_list.append(msg)
         else:
-            root_messages.append(msg)
+            root_thread_messages.append(msg)
 
     context = {
         "forum_thread": forum_thread,
         "base_thread": base_thread,
-        "root_messages": root_messages,
+        "root_thread_messages": root_thread_messages,
         "pinned_answer": pinned_answer,
         "form": form,
         "current_sort": sort_option,
@@ -188,10 +190,10 @@ def thread_detail(request, pk):
 @login_required
 @require_POST
 def toggle_message_pin(request, message_id):
-    # 1. Fetch message and the associated ForumThread
-    message = get_object_or_404(ThreadMessage, pk=message_id)
+    # 1. Fetch thread message and the associated ForumThread
+    thread_message = get_object_or_404(ThreadMessage, pk=message_id)
     try:
-        forum_thread = message.thread.forumthread
+        forum_thread = thread_message.thread.forumthread
     except ForumThread.DoesNotExist:
         return JsonResponse({"error": "Forum thread not found"}, status=404)
 
@@ -200,20 +202,20 @@ def toggle_message_pin(request, message_id):
         return JsonResponse({"error": "Only the author can mark an answer"}, status=403)
 
     with transaction.atomic():
-        if message.is_pinned:
+        if thread_message.is_pinned:
             # Unpin current
-            message.is_pinned = False
-            message.save()
+            thread_message.is_pinned = False
+            thread_message.save()
             action = "unpinned"
         else:
             # 3. Enforce Exclusivity: Unpin all other messages in this thread
-            ThreadMessage.objects.filter(thread=message.thread, is_pinned=True).update(
-                is_pinned=False
-            )
+            ThreadMessage.objects.filter(
+                thread=thread_message.thread, is_pinned=True
+            ).update(is_pinned=False)
 
             # Pin the new one
-            message.is_pinned = True
-            message.save()
+            thread_message.is_pinned = True
+            thread_message.save()
             action = "pinned"
 
     return JsonResponse({"status": "success", "action": action})
@@ -222,8 +224,8 @@ def toggle_message_pin(request, message_id):
 @require_POST
 @login_required
 def vote_message(request, message_id):
-    """Handle upvoting and downvoting on a message."""
-    message = get_object_or_404(ThreadMessage, pk=message_id)
+    """Handle upvoting and downvoting on a thread message."""
+    thread_message = get_object_or_404(ThreadMessage, pk=message_id)
     vote_type_param = request.POST.get("vote_type")  # 'upvote' or 'downvote'
 
     if vote_type_param not in ["upvote", "downvote"]:
@@ -234,10 +236,10 @@ def vote_message(request, message_id):
     )
 
     with transaction.atomic():
-        # Lock the message row to prevent race conditions updating counts
-        message = ThreadMessage.objects.select_for_update().get(pk=message_id)
+        # Lock the thread message row to prevent race conditions updating counts
+        thread_message = ThreadMessage.objects.select_for_update().get(pk=message_id)
         vote, created = MessageVote.objects.get_or_create(
-            message=message,
+            message=thread_message,
             user=request.user,
             defaults={"vote_type": target_vote_type},
         )
@@ -252,12 +254,12 @@ def vote_message(request, message_id):
                 vote.save()
 
         # Recalculate accurate counts dynamically
-        upvotes = message.votes.filter(vote_type=VoteType.UPVOTE).count()
-        downvotes = message.votes.filter(vote_type=VoteType.DOWNVOTE).count()
+        upvotes = thread_message.votes.filter(vote_type=VoteType.UPVOTE).count()
+        downvotes = thread_message.votes.filter(vote_type=VoteType.DOWNVOTE).count()
 
-        message.upvote_count = upvotes
-        message.downvote_count = downvotes
-        message.save(update_fields=["upvote_count", "downvote_count"])
+        thread_message.upvote_count = upvotes
+        thread_message.downvote_count = downvotes
+        thread_message.save(update_fields=["upvote_count", "downvote_count"])
 
     return JsonResponse(
         {
