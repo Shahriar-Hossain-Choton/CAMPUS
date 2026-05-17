@@ -1,314 +1,78 @@
 {% extends "skill_exchange/base.html" %}
-{% block title %}My Skill Exchange Matches - CAMPUS{% endblock %}
 
 {% block content %}
-<div class="lf-wrap">
 
-  <div class="lf-header">
-    <div class="lf-header__row">
-      <div>
-        <h1>My Matches</h1>
-        <p>Skill exchange matches where both can help each other~</p>
-      </div>
-      <a href="{% url 'skill_exchange:post_list' %}" class="btn btn--primary">← My Posts</a>
+<div class="lf-header">
+  <div class="lf-header__row">
+    <div>
+      <h1>Matches</h1>
+      <p>Browse all your matches in one place ~</p>
     </div>
   </div>
-
-  <!-- Filter bar -->
-  <div class="lf-filter-bar" id="filterBar" style="
-    display: flex; flex-wrap: wrap; align-items: center;
-    gap: 8px; margin-bottom: 20px;">
-
-    {# Status pills #}
-    <div style="display:flex; gap:6px;">
-      <button class="lf-filter-pill active" data-filter="status" data-value="all">All</button>
-      <button class="lf-filter-pill" data-filter="status" data-value="pending">Pending</button>
-      <button class="lf-filter-pill" data-filter="status" data-value="matched">Matched</button>
-      <button class="lf-filter-pill" data-filter="status" data-value="closed">Closed</button>
-    </div>
-
-    {# Result count #}
-    <span id="filterCount" style="font-size: 13px; color: var(--text-muted); margin-left: auto;"></span>
-  </div>
-
-  {% if pending_matches or matched_matches or closed_matches %}
-    <div class="post-grid">
-      
-      {% for match in pending_matches %}
-        <a href="{% url 'skill_exchange:match_detail' match_id=match.id %}"
-          class="post-card match-card"
-          data-status="pending">
-
-          {# ── Cover ── #}
-          <div class="post-card__cover" style="background: linear-gradient(135deg, var(--orange-light) 0%, var(--gray-light) 100%); display: flex; align-items: center; justify-content: center;">
-            <svg width="48" height="48" viewBox="0 0 24 24" fill="none"
-                 stroke="currentColor" stroke-width="1.5"
-                 stroke-linecap="round" stroke-linejoin="round" style="color: var(--orange);">
-              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-              <circle cx="9" cy="7" r="4"/>
-              <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
-              <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-            </svg>
-          </div>
-
-          {# ── Badge ── #}
-          <div class="post-card__badge">
-            <span class="badge badge--pending">Pending</span>
-          </div>
-
-          {# ── Body ── #}
-          <div class="post-card__body">
-            <h3 class="post-card__title">
-              {% if match.ex_p_a.author == user %}
-                Match with {{ match.ex_p_b.author.handle }}
-              {% else %}
-                Match with {{ match.ex_p_a.author.handle }}
-              {% endif %}
-            </h3>
-            <p class="post-card__meta text-small text-muted">
-              {% if match.ex_p_a.author == user %}
-                {{ match.ex_p_b.skills_offered.all|join:", "|truncatewords:3 }}
-              {% else %}
-                {{ match.ex_p_a.skills_offered.all|join:", "|truncatewords:3 }}
-              {% endif %}
-            </p>
-            <p class="post-card__date text-small text-muted">
-              Matched {{ match.matched_at|date:"M d, Y" }}
-            </p>
-          </div>
-        </a>
-      {% endfor %}
-
-      {% for match in matched_matches %}
-        <a href="{% url 'skill_exchange:session_detail' session_id=match.exchangesession.id %}"
-          class="post-card match-card"
-          data-status="matched">
-
-          {# ── Cover ── #}
-          <div class="post-card__cover" style="background: linear-gradient(135deg, var(--success-light) 0%, var(--gray-light) 100%); display: flex; align-items: center; justify-content: center;">
-            <svg width="48" height="48" viewBox="0 0 24 24" fill="none"
-                 stroke="currentColor" stroke-width="1.5"
-                 stroke-linecap="round" stroke-linejoin="round" style="color: var(--success);">
-              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-              <circle cx="9" cy="7" r="4"/>
-              <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
-              <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-              <polyline points="9 12 11 14 15 10"/>
-            </svg>
-          </div>
-
-          {# ── Badge ── #}
-          <div class="post-card__badge">
-            <span class="badge badge--success">Connected</span>
-          </div>
-
-          {# ── Body ── #}
-          <div class="post-card__body">
-            <h3 class="post-card__title">
-              {% if match.ex_p_a.author == user %}
-                {{ match.ex_p_b.author.handle }}
-              {% else %}
-                {{ match.ex_p_a.author.handle }}
-              {% endif %}
-            </h3>
-            <p class="post-card__meta text-small text-muted">
-              {% if match.ex_p_a.author == user %}
-                Exchange in progress
-              {% else %}
-                Exchange in progress
-              {% endif %}
-            </p>
-            <p class="post-card__date text-small text-muted">
-              Connected {{ match.matched_at|date:"M d, Y" }}
-            </p>
-          </div>
-        </a>
-      {% endfor %}
-
-      {% for match in closed_matches %}
-        <div class="post-card match-card" data-status="closed" style="opacity: 0.6;">
-
-          {# ── Cover ── #}
-          <div class="post-card__cover" style="background: linear-gradient(135deg, var(--border) 0%, var(--gray-light) 100%); display: flex; align-items: center; justify-content: center;">
-            <svg width="48" height="48" viewBox="0 0 24 24" fill="none"
-                 stroke="currentColor" stroke-width="1.5"
-                 stroke-linecap="round" stroke-linejoin="round" style="color: var(--text-muted);">
-              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-              <circle cx="9" cy="7" r="4"/>
-              <line x1="16" y1="11" x2="22" y2="17"/>
-              <line x1="22" y1="11" x2="16" y2="17"/>
-            </svg>
-          </div>
-
-          {# ── Badge ── #}
-          <div class="post-card__badge">
-            <span class="badge badge--error">Closed</span>
-          </div>
-
-          {# ── Body ── #}
-          <div class="post-card__body">
-            <h3 class="post-card__title">
-              {% if match.ex_p_a.author == user %}
-                Was matched with {{ match.ex_p_b.author.handle }}
-              {% else %}
-                Was matched with {{ match.ex_p_a.author.handle }}
-              {% endif %}
-            </h3>
-            <p class="post-card__meta text-small text-muted">
-              Match ended
-            </p>
-            <p class="post-card__date text-small text-muted">
-              {{ match.matched_at|date:"M d, Y" }}
-            </p>
-          </div>
-        </div>
-      {% endfor %}
-
-    </div>
-  {% else %}
-    <div style="text-align: center; padding: 48px 16px;">
-      <svg width="64" height="64" viewBox="0 0 24 24" fill="none"
-           stroke="currentColor" stroke-width="1" stroke-linecap="round"
-           stroke-linejoin="round" style="color: var(--text-muted); margin-bottom: 16px; opacity: 0.5;">
-        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-        <circle cx="9" cy="7" r="4"/>
-        <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
-        <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-      </svg>
-      <p class="text-muted" style="font-size: 15px;">No matches yet.</p>
-      <p class="text-muted text-small" style="margin-top: 4px;">Create a post to get started!</p>
-      <a href="{% url 'skill_exchange:post_create' %}" class="btn btn--primary btn--sm" style="margin-top: 16px;">+ Create Post</a>
-    </div>
-  {% endif %}
-
 </div>
 
+<div class="card" style="margin-bottom: 24px;">
+    <div class="card__header">
+        <h2 class="card__title">Pending Matches</h2>
+        <div class="card__meta">New opportunities found by our engine</div>
+    </div>
+    <div class="card__body">
+        {% if pending_matches %}
+            {% for match in pending_matches %}
+                <div class="card sx-match-card" style="border: 1px solid var(--border-dark);">
+                    <div class="card__body">
+                        <div class="sx-trade-container">
+                            <div class="sx-trade-party">
+                                <div class="sx-user-label">You offer</div>
+                                <div class="sx-user-name">{{ match.user_context.my_skill.name }}</div>
+                            </div>
+                            
+                            <div class="sx-trade-arrow">⇄</div>
+                            
+                            <div class="sx-trade-party sx-trade-party--right">
+                                <div class="sx-user-label"><a href="{% url 'accounts:profile' handle=match.user_context.partner_user.handle %}">@{{ match.user_context.partner_user.handle }}</a> offers</div>
+                                <div class="sx-user-name">{{ match.user_context.partner_skill.name }}</div>
+                            </div>
+                        </div>
+
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 16px;">
+                            <div class="status-indicators" style="margin-top: 10px;">
+                                {% if match.ex_p_a.author == request.user %}
+                                    {# I am User A #}
+                                    You: <span class="badge {% if match.user_a_accepted %}badge--active{% endif %}">{% if match.user_a_accepted %}Accepted{% else %}Pending{% endif %}</span>
+                                    Partner: <span class="badge {% if match.user_b_accepted %}badge--active{% endif %}">{% if match.user_b_accepted %}Accepted{% else %}Pending{% endif %}</span>
+                                {% else %}
+                                    {# I am User B #}
+                                    You: <span class="badge {% if match.user_b_accepted %}badge--active{% endif %}">{% if match.user_b_accepted %}Accepted{% else %}Pending{% endif %}</span>
+                                    Partner: <span class="badge {% if match.user_a_accepted %}badge--active{% endif %}">{% if match.user_a_accepted %}Accepted{% else %}Pending{% endif %}</span>
+                                {% endif %}
+                            </div>
+
+                            <div class="actions" style="margin-top: 15px;">
+                                {# Only show buttons if I haven't accepted yet #}
+                                {% if match.ex_p_a.author == request.user and not match.user_a_accepted or match.ex_p_b.author == request.user and not match.user_b_accepted %}
+                                    <form method="POST" action="{% url 'skill_exchange:match_confirm_decision' match.id %}">
+                                        {% csrf_token %}
+                                        <button type="submit" name="action" value="accepted" class="btn btn--primary btn--sm">Accept</button>
+                                        <button type="submit" name="action" value="rejected" class="btn btn--outline btn--sm">Decline</button>
+                                    </form>
+                                {% else %}
+                                    <p class="alert alert--info" style="background: var(--orange-light); padding: 12px; border: 1px solid var(--orange-border);">Waiting for partner's final confirmation...</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div style="margin-top: 12px;">
+                            <p style="font-size: 14px; color: var(--text-muted); line-height: 1.5;">
+                                Message from <a href="{% url 'accounts:profile' handle=match.user_context.partner_user.handle %}">@{{ match.user_context.partner_user.handle }}</a> : {{ match.user_context.partner_post.description }}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p class="sx-empty-state">No new matches right now. We'll notify you when someone fits your needs!</p>
+        {% endif %}
+    </div>
 </div>
-
-<style>
-  .lf-filter-pill {
-    padding: 6px 12px;
-    border-radius: 20px;
-    border: 1px solid var(--border);
-    background: transparent;
-    color: var(--text);
-    font-size: 14px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.2s;
-  }
-
-  .lf-filter-pill:hover {
-    border-color: var(--orange);
-    color: var(--orange);
-  }
-
-  .lf-filter-pill.active {
-    background: var(--orange);
-    color: white;
-    border-color: var(--orange);
-  }
-
-  .post-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-    gap: 16px;
-  }
-
-  .post-card {
-    display: flex;
-    flex-direction: column;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-md);
-    overflow: hidden;
-    transition: all 0.2s;
-    text-decoration: none;
-    color: inherit;
-  }
-
-  .post-card:hover {
-    border-color: var(--orange);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-    transform: translateY(-2px);
-  }
-
-  .post-card__cover {
-    width: 100%;
-    height: 140px;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .post-card__badge {
-    position: absolute;
-    top: 8px;
-    left: 8px;
-    z-index: 1;
-  }
-
-  .post-card__body {
-    padding: 12px;
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-  }
-
-  .post-card__title {
-    font-size: 14px;
-    font-weight: 600;
-    color: var(--text);
-    margin: 0 0 6px;
-    line-height: 1.4;
-  }
-
-  .post-card__meta {
-    font-size: 12px;
-    color: var(--text-muted);
-    margin: 0 0 4px;
-  }
-
-  .post-card__date {
-    font-size: 11px;
-    color: var(--text-muted);
-    margin-top: auto;
-  }
-</style>
-
-<script>
-  // Simple filter logic
-  document.querySelectorAll('.lf-filter-pill').forEach(btn => {
-    btn.addEventListener('click', function() {
-      const filter = this.getAttribute('data-value');
-      const filterType = this.getAttribute('data-filter');
-      
-      // Update active state
-      document.querySelectorAll(`.lf-filter-pill[data-filter="${filterType}"]`).forEach(b => {
-        b.classList.remove('active');
-      });
-      this.classList.add('active');
-      
-      // Filter cards
-      const cards = document.querySelectorAll('.post-card');
-      let visibleCount = 0;
-      
-      cards.forEach(card => {
-        if (filter === 'all' || card.getAttribute('data-status') === filter) {
-          card.style.display = '';
-          visibleCount++;
-        } else {
-          card.style.display = 'none';
-        }
-      });
-      
-      // Update count
-      document.getElementById('filterCount').textContent = `${visibleCount} match${visibleCount !== 1 ? 'es' : ''}`;
-    });
-  });
-  
-  // Initialize count
-  const initialCount = document.querySelectorAll('.post-card:not([style*="display: none"])').length;
-  document.getElementById('filterCount').textContent = `${initialCount} match${initialCount !== 1 ? 'es' : ''}`;
-</script>
 
 {% endblock %}

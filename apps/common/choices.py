@@ -46,20 +46,25 @@ class VoteStatus(models.TextChoices):
 
 
 # Skill Exchange domain choices
-class ExchangePostStatus(models.TextChoices):
+class SkillStatus(models.TextChoices):
     PENDING = "pending", "Pending"
-    MATCHED = "matched", "Matched"
+    ACCEPTED = "accepted", "Accepted"
     REJECTED = "rejected", "Rejected"
+
+
+class ExchangePostStatus(models.TextChoices):
+    MATCHING = "matching", "Matching"
+    DELETED = "deleted", "Deleted"
 
 
 class ExchangeMatchStatus(models.TextChoices):
     PENDING = "pending", "Pending"
-    MATCHED = "matched", "Matched"
-    CLOSED = "closed", "Closed"
+    CONFIRMED = "confirmed", "Confirmed"
+    REJECTED = "rejected", "Rejected"
 
 
 class ExchangeSessionStatus(models.TextChoices):
-    PENDING = "pending", "Pending"
+    # PENDING = "pending", "Pending"
     ACTIVE = "active", "Active"
     COMPLETED = "completed", "Completed"
     CANCELLED = "cancelled", "Cancelled"
@@ -71,16 +76,16 @@ class SessionFeedbackStatus(models.TextChoices):
     REJECTED = "rejected", "Rejected"
 
 
-class SessionEndRequestStatus(models.TextChoices):
-    PENDING = "pending", "Pending"
-    APPROVED = "approved", "Approved"
-    DENIED = "denied", "Denied"
+# class SessionEndRequestStatus(models.TextChoices):
+#     PENDING = "pending", "Pending"
+#     APPROVED = "approved", "Approved"
+#     DENIED = "denied", "Denied"
 
 
-class MatchDecisionStatus(models.TextChoices):
-    PENDING = "pending", "Pending"
-    ACCEPTED = "accepted", "Accepted"
-    REJECTED = "rejected", "Rejected"
+# class MatchDecisionStatus(models.TextChoices):
+#     PENDING = "pending", "Pending"
+#     ACCEPTED = "accepted", "Accepted"
+#     REJECTED = "rejected", "Rejected"
 
 
 # Lost and Found post types

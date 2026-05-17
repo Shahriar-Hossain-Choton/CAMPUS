@@ -2,7 +2,7 @@
 {% block title %}New Skill Exchange Post{% endblock %}
 
 {% block content %}
-<div class="lf-wrap">
+<div class="lf-wrap" style="max-width: 680px;">
 
   <div class="lf-header">
     <div class="lf-header__row">
@@ -13,16 +13,9 @@
     </div>
   </div>
 
-  <div style="max-width: 560px;">
+  <div class="card">
     <form method="post" novalidate>
       {% csrf_token %}
-
-      {# Non-field errors #}
-      {% if form.non_field_errors %}
-        <div class="message message--error" style="margin-bottom: 20px;">
-          {% for e in form.non_field_errors %}{{ e }}{% endfor %}
-        </div>
-      {% endif %}
 
       {# ── About you ────────────────────────────────────────── #}
       <p class="form-section-title">About You</p>

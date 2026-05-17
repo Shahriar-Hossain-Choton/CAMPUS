@@ -68,6 +68,9 @@ class UserProfile(models.Model):
         choices=ProfileStatus.choices,
         default=ProfileStatus.PENDING,
     )
+    sx_rating_avg = models.FloatField(
+        default=0.0
+    )  # Average rating from skill exchange feedback
     is_graduated = models.BooleanField(default=False)
     is_verified = models.BooleanField(default=False)
     is_moderator = models.BooleanField(default=False)

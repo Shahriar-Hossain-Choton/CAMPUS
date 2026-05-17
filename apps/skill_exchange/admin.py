@@ -3,9 +3,9 @@ from .models import (
     ExchangeMatch,
     ExchangePost,
     ExchangeSession,
-    MatchDecision,
+    # MatchDecision,
     SessionFeedback,
-    SessionEndRequest,
+    # SessionEndRequest,
     Skill,
     UserSkill,
 )
@@ -16,5 +16,5 @@ admin.site.register(UserSkill)
 admin.site.register(ExchangeMatch)
 admin.site.register(ExchangeSession)
 admin.site.register(SessionFeedback)
-admin.site.register(MatchDecision)
-admin.site.register(SessionEndRequest)
+# admin.site.register(MatchDecision)
+# admin.site.register(SessionEndRequest)

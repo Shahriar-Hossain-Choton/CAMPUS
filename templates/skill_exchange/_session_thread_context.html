@@ -1,0 +1,95 @@
+{# Context partial injected into threads/thread_detail.html #}
+{% load skill_exchange_extras %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'skill_exchange/css/skill_exchange.css' %}">
+{% endblock %}
+
+<div class="card" style="margin-bottom: 20px; border-left: 4px solid var(--orange);">
+    <div class="card__header">
+        <div>
+            <p class="card__title">Skill Exchange Session</p>
+            <div class="card__meta">
+                {% if ctx.status == 'active' %}
+                    <span class="badge badge--active">Active</span>
+                {% else %}
+                    <span class="badge badge--found">Completed</span>
+                {% endif %}
+                <span>Agreement established on {{ ctx.started_at|date:"M d, Y h:m A" }}</span>
+            </div>
+        </div>
+    </div>
+    <div class="card__body">
+        <div class="sx-trade-container" style="background: var(--surface); border: 1px solid var(--border);">
+            <div class="sx-trade-party">
+                <div class="sx-user-label">{{ ctx.match.ex_p_a.author.get_full_name|default:ctx.match.ex_p_a.author.handle }} teaches</div>
+                <div class="sx-skill-tag">{{ ctx.match.skill_a_offers.name }}</div>
+            </div>
+            <div class="sx-trade-arrow">⇄</div>
+            <div class="sx-trade-party sx-trade-party--right">
+                <div class="sx-user-label">{{ ctx.match.ex_p_b.author.get_full_name|default:ctx.match.ex_p_b.author.handle }} teaches</div>
+                <div class="sx-skill-tag">{{ ctx.match.skill_b_offers.name }}</div>
+            </div>
+        </div>
+
+
+        {# --- FEEDBACK UI --- #}
+        {% with my_feedback=ctx|get_user_feedback:request.user %}
+        <div class="feedback-ui" style="margin-top: 16px; padding-top: 16px; border-top: 1px dashed var(--border);">
+            <p style="font-size: 13px; font-weight: 600; margin-bottom: 8px;">
+                Rate your partner (Private)
+            </p>
+            
+            <form method="POST" action="{% url 'skill_exchange:submit_session_feedback' ctx.id %}" style="display: flex; gap: 8px; align-items: center;">
+                {% csrf_token %}
+                
+                <select name="rating" class="form-control" style="width: auto; padding: 4px 8px; border-radius: 4px;" required>
+                    <option value="" disabled {% if not my_feedback %}selected{% endif %}>Score / 10</option>
+                    {% for i in "123456789"|make_list %}
+                        <option value="{{ i }}" {% if my_feedback.rating|stringformat:"s" == i %}selected{% endif %}>{{ i }} / 10</option>
+                    {% endfor %}
+                    <option value="10" {% if my_feedback.rating == 10 %}selected{% endif %}>10 / 10</option>
+                </select>
+
+                <button type="submit" class="btn btn--outline btn--sm">
+                    {% if my_feedback %}Update Rating{% else %}Submit Rating{% endif %}
+                </button>
+            </form>
+            <p style="font-size: 11px; color: var(--text-light); margin-top: 4px;">
+                This score is averaged into their profile. They will not see what you rated them.
+            </p>
+        </div>
+        {% endwith %}
+
+        {# End Session Handshake UI #}
+        {% if ctx.status == 'active' %}
+            <div class="end-session-ui" style="margin-top: 16px; padding-top: 16px; border-top: 1px dashed var(--border);">
+                {% if not ctx.user_a_completed and not ctx.user_b_completed %}
+                    {# No one has clicked yet #}
+                    <form method="POST" action="{% url 'skill_exchange:session_complete_decision' ctx.id %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn--outline btn--sm">End Session</button>
+                    </form>
+
+                {# Check if current user is Participant A and is done, OR Participant B and is done #}
+                {% elif ctx.match.ex_p_a.author == request.user and ctx.user_a_completed or ctx.match.ex_p_b.author == request.user and ctx.user_b_completed %}
+                    {# I have clicked, but my partner hasn't #}
+                    <div class="alert alert--warning" style="background: var(--orange-light); padding: 12px; border: 1px solid var(--orange-border);">
+                        <p style="margin-bottom: 10px;"><i>Waiting for partner to confirm session completion...</i></p>
+                    </div>
+
+                {% else %}
+                    {# My partner clicked, I need to confirm #}
+                    <div class="alert alert--warning" style="background: var(--orange-light); padding: 12px; border: 1px solid var(--orange-border);">
+                        <p style="margin-bottom: 10px;">Your partner has marked this session as complete.</p>
+                        <form method="POST" action="{% url 'skill_exchange:session_complete_decision' ctx.id %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn--primary btn--sm">Confirm & Close Session</button>
+                        </form>
+                    </div>
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
+</div>

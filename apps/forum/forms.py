@@ -36,13 +36,13 @@ class ForumThreadCreateForm(forms.Form):
     title = forms.CharField(max_length=255)
     description = forms.CharField(
         widget=forms.Textarea(attrs={"rows": 5}),
-        required=False,
+        required=True,
         help_text="Main body text for your thread.",
     )
     department = forms.ModelChoiceField(
         queryset=Department.objects.all(), required=True
     )
-    course = forms.ModelChoiceField(queryset=Course.objects.all(), required=True)
+    course = forms.ModelChoiceField(queryset=Course.objects.all(), required=False)
 
     participants = forms.CharField(
         required=False,

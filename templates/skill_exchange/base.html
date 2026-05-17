@@ -1,41 +1,28 @@
 {% extends "base.html" %}
 {% load static %}
 
-{# ── Skill Exchange styles ────────────────────────────────────
-   Loads shared lost_found styles + skill_exchange.css on top of 
-   the global campus.css that base.html already provides.
-#}
+{% block title %}Skill Exchange | CAMPUS{% endblock %}
+
 {% block extra_css %}
-  <link rel="stylesheet" href="{% static 'lost_found/css/lost_found.css' %}">
-  <link rel="stylesheet" href="{% static 'skill_exchange/css/skill_exchange.css' %}">
+<link rel="stylesheet" href="{% static 'skill_exchange/css/skill_exchange.css' %}">
 {% endblock %}
 
-{# ── Skill Exchange sub-navigation ────────────────────────────
-   Renders a thin strip below the global nav with SE-specific
-   links. All skill_exchange templates continue to extend this file
-   exactly as before — nothing else changes for them.
-#}
 {% block subnav %}
 <div class="campus-subnav">
   <div class="campus-subnav__inner">
-
-    {% if user.is_authenticated %}
-      <a href="{% url 'skill_exchange:post_list' %}"
-         {% if request.resolver_match.url_name == 'post_list' %}class="active"{% endif %}>
+    <a href="{% url 'skill_exchange:post_list' %}" class="{% if request.resolver_match.url_name == 'post_list' %}active{% endif %}">
         My Posts
-      </a>
-      <div class="subnav-divider"></div>
-      <a href="{% url 'skill_exchange:match_list' %}"
-         {% if request.resolver_match.url_name == 'match_list' %}class="active"{% endif %}>
-        My Matches
-      </a>
-      <div class="subnav-divider"></div>
-      <a href="{% url 'skill_exchange:post_create' %}"
-         {% if request.resolver_match.url_name == 'post_create' %}class="active"{% endif %}>
-        + New Post
-      </a>
-    {% endif %}
-
+    </a>
+    <a href="{% url 'skill_exchange:match_list' %}" class="{% if request.resolver_match.url_name == 'match_list' %}active{% endif %}">
+        Matches
+    </a>
+    <a href="{% url 'skill_exchange:session_list' %}" class="{% if request.resolver_match.url_name == 'session_list' %}active{% endif %}">
+        Sessions
+    </a>
+    <div class="subnav-divider"></div>
+    <a href="{% url 'skill_exchange:post_create' %}" class="{% if request.resolver_match.url_name == 'post_create' %}active{% endif %}">
+        + Create Post
+    </a>
   </div>
 </div>
 {% endblock %}

@@ -1,0 +1,43 @@
+{% extends "skill_exchange/base.html" %}
+
+{% block content %}
+
+<div class="lf-header">
+  <div class="lf-header__row">
+    <div>
+      <h1>Sessions</h1>
+      <p>Browse all your sessions in one place ~</p>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+    <div class="card__header">
+        <h2 class="card__title">Active Sessions</h2>
+    </div>
+    <div class="card__body">
+        {% if active_sessions %}
+            {% for session in active_sessions %}
+                <div class="card sx-match-card">
+                    <div class="card__body" style="display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <h3 style="font-size: 16px; font-weight: 600; margin-bottom: 4px;">
+                                Exchange: {{ session.match.skill_a_offers.name }} & {{ session.match.skill_b_offers.name }}
+                            </h3>
+                            <p style="font-size: 13px; color: var(--text-muted);">
+                                Session active since {{ session.started_at|date:"M d" }}
+                            </p>
+                        </div>
+                        <a href="{% url 'threads:thread_detail' thread_id=session.thread.id %}" class="btn btn--outline btn--sm">
+                            Open Chat
+                        </a>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p class="sx-empty-state">No active sessions.</p>
+        {% endif %}
+    </div>
+</div>
+
+{% endblock %}

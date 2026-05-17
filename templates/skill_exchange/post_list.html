@@ -1,105 +1,63 @@
 {% extends "skill_exchange/base.html" %}
-{% load static %}
-{% block title %}My Skill Exchange Posts - CAMPUS{% endblock %}
 
 {% block content %}
-<div class="lf-wrap">
-
-  <div class="lf-header">
-    <div class="lf-header__row">
-      <div>
-        <h1>My Posts</h1>
-        <p>Review and edit your skill exchange posts.</p>
-      </div>
-      <a href="{% url 'skill_exchange:post_create' %}" class="btn btn--primary">+ New Post</a>
+<div class="lf-header">
+  <div class="lf-header__row">
+    <div>
+      <h1>My Posts</h1>
+      <p>Browse all your exchange posts in one place ~</p>
     </div>
+    <a href="{% url 'skill_exchange:post_create' %}" class="btn btn--primary">+ New Post</a>
   </div>
+</div>
+<div class="card">
+    <div class="card__body">
+        {% if posts %}
+            {% for post in posts %}
+                <div class="card sx-match-card" style="border: 1px solid var(--border);">
+                    <div class="card__body">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+                            <div>
+                                <span class="badge {% if post.status == 'matching' %}badge--active{% else %}badge--muted{% endif %}">
+                                    {{ post.get_status_display }}
+                                </span>
+                                <small style="color: var(--text-muted); margin-left: 8px;">Created {{ post.created_at|date:"M d, Y" }}</small>
+                            </div>
+                            
+                            <form method="POST" action="{% url 'skill_exchange:post_delete' post.id %}" onsubmit="return confirm('Are you sure? This will remove all pending matches for this post.');">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn--outline btn--sm" style="color: var(--red); border-color: var(--red-light);">Delete</button>
+                            </form>
+                        </div>
 
-  {% if posts %}
-    <div class="post-grid">
-      {% for post in posts %}
+                        <div style="margin-bottom: 12px;">
+                            <div class="sx-user-label">Offering</div>
+                            {% for skill in post.skills_offered.all %}
+                                <span class="sx-skill-tag">{{ skill.name }}</span>
+                            {% endfor %}
+                        </div>
 
-        <div class="post-card"
-          data-status="{{ post.status }}">
+                        <div style="margin-bottom: 12px;">
+                            <div class="sx-user-label">Seeking</div>
+                            {% for skill in post.skills_needed.all %}
+                                <span class="sx-skill-tag sx-skill-tag--needed">{{ skill.name }}</span>
+                            {% endfor %}
+                        </div>
 
-          {# ── Body (text-only, no cover image) ── #}
-          <div class="post-card__body">
-
-            <div class="post-card__title">{{ post.author.handle }}</div>
-
-            {# Status badge - prominent #}
-            <div style="margin-bottom: 10px;">
-              {% if post.deleted_at %}
-                <span class="badge badge--success">Completed</span>
-              {% else %}
-                <span class="badge badge--info">{{ post.get_status_display }}</span>
-              {% endif %}
-            </div>
-
-            {# Skills Offered #}
-            <div style="margin-bottom: 12px;">
-              <strong style="font-size: 0.95em; color: var(--text);">Offering:</strong>
-              {% if post.skills_offered.exists %}
-                <div style="margin-top: 5px; display: flex; flex-wrap: wrap; gap: 5px;">
-                  {% for skill in post.skills_offered.all %}
-                    <span style="display: inline-block; background-color: var(--green-light); color: var(--green); padding: 3px 8px; border-radius: var(--radius); font-size: 0.85em;">{{ skill.name }}</span>
-                  {% endfor %}
+                        {% if post.description %}
+                            <p style="font-size: 14px; color: var(--text-muted); line-height: 1.5; margin-top: 12px; border-top: 1px solid var(--bg); padding-top: 12px;">
+                                {{ post.description }}
+                            </p>
+                        {% endif %}
+                    </div>
                 </div>
-              {% else %}
-                <span style="color: var(--text-muted); font-size: 0.9em; display: block; margin-top: 3px;">No skills offered</span>
-              {% endif %}
+            {% endfor %}
+        {% else %}
+            <div class="sx-empty-state">
+                <p>You haven't posted any skills yet.</p>
+                <a href="{% url 'skill_exchange:post_create' %}" class="btn btn--primary" style="margin-top: 16px;">Create your first post</a>
             </div>
-
-            {# Skills Needed #}
-            <div style="margin-bottom: 12px;">
-              <strong style="font-size: 0.95em; color: var(--text);">Seeking:</strong>
-              {% if post.skills_needed.exists %}
-                <div style="margin-top: 5px; display: flex; flex-wrap: wrap; gap: 5px;">
-                  {% for skill in post.skills_needed.all %}
-                    <span style="display: inline-block; background-color: var(--blue-light); color: var(--blue); padding: 3px 8px; border-radius: var(--radius); font-size: 0.85em;">{{ skill.name }}</span>
-                  {% endfor %}
-                </div>
-              {% else %}
-                <span style="color: var(--text-muted); font-size: 0.9em; display: block; margin-top: 3px;">No skills needed</span>
-              {% endif %}
-            </div>
-
-            {# Post Description #}
-            {% if post.description %}
-              <div style="margin-bottom: 10px; padding-top: 8px; border-top: 1px solid var(--border);">
-                <p style="margin: 0; font-size: 0.9em; color: var(--text-muted); line-height: 1.4;">{{ post.description|truncatewords:30 }}</p>
-              </div>
-            {% endif %}
-
-            {# Post Date #}
-            <div class="post-card__meta">
-              <div class="post-card__meta-item">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none"
-                     stroke="currentColor" stroke-width="2"
-                     stroke-linecap="round" stroke-linejoin="round">
-                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
-                  <line x1="16" y1="2" x2="16" y2="6"/>
-                  <line x1="8" y1="2" x2="8" y2="6"/>
-                  <line x1="3" y1="10" x2="21" y2="10"/>
-                </svg>
-                {{ post.created_at|date:"M d, Y" }}
-              </div>
-            </div>
-
-          </div>
-
-        </div>
-
-      {% endfor %}
+        {% endif %}
     </div>
-
-  {% else %}
-    <div class="empty">
-      <h3>No posts yet</h3>
-      <p>Create a skill exchange post to start matching with the campus community!</p>
-      <a href="{% url 'skill_exchange:post_create' %}" class="btn btn--primary">Create Post</a>
-    </div>
-  {% endif %}
-
 </div>
 {% endblock %}
