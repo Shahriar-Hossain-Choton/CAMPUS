@@ -23,16 +23,16 @@
 <body>
 
   {# ── Global navigation ────────────────────────────────────── #}
-  <nav class="lf-nav">
-    <div class="lf-nav__inner">
+  <nav class="campus-nav">
+    <div class="campus-nav__inner">
 
       {# Brand #}
-      <a href="{% url 'home' %}" class="lf-nav__brand">
+      <a href="{% url 'home' %}" class="campus-nav__brand">
         <span>CAMPUS</span>
       </a>
 
       {# Five platform features #}
-      <ul class="lf-nav__links" style="flex: 1; justify-content: center;">
+      <ul class="campus-nav__links" style="flex: 1; justify-content: center;">
         <li>
           <a href="{% url 'skill_exchange:post_list' %}"
              {% if request.resolver_match.app_name == 'skill_exchange' %}class="active"{% endif %}>
@@ -117,8 +117,8 @@
 
   {# ── Flash messages ───────────────────────────────────────── #}
   {% if messages %}
-    <div class="lf-wrap" style="padding-top: 16px;">
-      <div class="lf-messages">
+    <div class="campus-wrap" style="padding-top: 16px;">
+      <div class="campus-messages">
         {% for message in messages %}
           <div class="message message--{{ message.tags|default:'info' }}">
             {{ message }}
@@ -129,7 +129,7 @@
   {% endif %}
 
   {# ── Page content ─────────────────────────────────────────── #}
-  <main class="lf-wrap" style="padding-top: 8px; padding-bottom: 48px;">
+  <main class="campus-wrap" style="padding-top: 8px; padding-bottom: 48px;">
     {% block content %}{% endblock %}
   </main>
 

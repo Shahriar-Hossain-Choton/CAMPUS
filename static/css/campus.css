@@ -55,14 +55,14 @@ a:hover { color: var(--orange-hover); text-decoration: underline; }
 img { max-width: 100%; display: block; }
 
 /* ── Layout ────────────────────────────────────────────────── */
-.lf-wrap {
+.campus-wrap {
   max-width: 860px;
   margin: 0 auto;
   padding: 0 20px;
 }
 
 /* ── Nav ───────────────────────────────────────────────────── */
-.lf-nav {
+.campus-nav {
   background: var(--surface);
   border-bottom: 2px solid var(--orange);
   position: sticky;
@@ -70,7 +70,7 @@ img { max-width: 100%; display: block; }
   z-index: 100;
 }
 
-.lf-nav__inner {
+.campus-nav__inner {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -80,7 +80,7 @@ img { max-width: 100%; display: block; }
   padding: 0 20px;
 }
 
-.lf-nav__brand {
+.campus-nav__brand {
   font-weight: 600;
   font-size: 15px;
   letter-spacing: .01em;
@@ -88,7 +88,7 @@ img { max-width: 100%; display: block; }
   text-decoration: none !important;
 }
 
-.lf-nav__brand span {
+.campus-nav__brand span {
   display: inline-block;
   background: var(--orange);
   color: #fff;
@@ -102,14 +102,14 @@ img { max-width: 100%; display: block; }
   vertical-align: middle;
 }
 
-.lf-nav__links {
+.campus-nav__links {
   display: flex;
   align-items: center;
   gap: 4px;
   list-style: none;
 }
 
-.lf-nav__links a {
+.campus-nav__links a {
   font-size: 13.5px;
   font-weight: 500;
   color: var(--text-muted);
@@ -119,45 +119,45 @@ img { max-width: 100%; display: block; }
   text-decoration: none;
 }
 
-.lf-nav__links a:hover,
-.lf-nav__links a.active {
+.campus-nav__links a:hover,
+.campus-nav__links a.active {
   background: var(--orange-light);
   color: var(--orange);
   text-decoration: none;
 }
 
 /* ── Page header ───────────────────────────────────────────── */
-.lf-header {
+.campus-header {
   padding: 28px 0 20px;
   border-bottom: 1px solid var(--border);
   margin-bottom: 24px;
 }
 
-.lf-header__row {
+.campus-header__row {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
   gap: 12px;
 }
 
-.lf-header h1 {
+.campus-header h1 {
   font-size: 22px;
   font-weight: 600;
   letter-spacing: -.01em;
 }
 
-.lf-header p {
+.campus-header p {
   font-size: 14px;
   color: var(--text-muted);
   margin-top: 4px;
 }
 
 /* ── Messages (Updated for Fixed Top-Left Overlay) ────────── */
-.lf-messages {
+.campus-messages {
   position: fixed;
   top: 20px;
   left: 20px;
-  z-index: 1100; /* Higher than .lf-nav's 100 to appear on top */
+  z-index: 1100; /* Higher than .campus-nav's 100 to appear on top */
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -504,7 +504,7 @@ img { max-width: 100%; display: block; }
   --shadow:    0 2px 8px rgba(0,0,0,.35);
 }
 
-[data-theme="dark"] .lf-nav {
+[data-theme="dark"] .campus-nav {
   border-bottom-color: var(--orange);
 }
 
