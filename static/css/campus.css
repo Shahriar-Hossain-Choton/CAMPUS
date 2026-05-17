@@ -194,10 +194,10 @@ img { max-width: 100%; display: block; }
   }
 }
 
-.message--success { background: var(--green-light);  border-color: var(--green);  color: #ffffff; }
-.message--error   { background: var(--red-light);    border-color: var(--red);    color: #ffffff; }
-.message--info    { background: var(--blue-light);   border-color: var(--blue);   color: #ffffff; }
-.message--warning { background: var(--amber-light);  border-color: var(--amber);  color: #ffffff; }
+.message--success { background: var(--green-light);  border-color: var(--green);  color: var(--text); }
+.message--error   { background: var(--red-light);    border-color: var(--red);    color: var(--text); }
+.message--info    { background: var(--blue-light);   border-color: var(--blue);   color: var(--text); }
+.message--warning { background: var(--amber-light);  border-color: var(--amber);  color: var(--text); }
 
 /* Remove the margin-top utility since we use 'gap' in the fixed container */
 .message + .message { margin-top: 0; }
