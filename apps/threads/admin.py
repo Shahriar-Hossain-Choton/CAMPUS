@@ -69,7 +69,7 @@ class MessageAttachmentAdmin(admin.ModelAdmin):
 @admin.register(ThreadParticipant)
 class ThreadParticipantAdmin(admin.ModelAdmin):
     list_display = ("thread", "user", "role", "joined_at")
-    list_filter = ("thread", "user", "role")
+    list_filter = ("role",)
 
 
 @admin.register(Tag)
