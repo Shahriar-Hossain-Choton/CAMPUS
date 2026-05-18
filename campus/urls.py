@@ -30,6 +30,7 @@ urlpatterns = [
     path("forum/", include("apps.forum.urls")),
     path("lost-found/", include("apps.lost_found.urls")),
     path("skill-exchange/", include("apps.skill_exchange.urls")),
+    path("notifications/", include("apps.notifications.urls")),
 ]
 
 if settings.DEBUG:

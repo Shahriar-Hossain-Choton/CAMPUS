@@ -1,0 +1,23 @@
+{% for n in notifications %}
+  
+  {% if n.data.url %}
+    <a href="{{ n.data.url }}" 
+       class="notif-item {% if not n.read %}notif-unread{% endif %}" 
+       data-id="{{ n.id }}" 
+       style="display: block; text-decoration: none; color: inherit;">
+  {% else %}
+    <div class="notif-item {% if not n.read %}notif-unread{% endif %}" data-id="{{ n.id }}">
+  {% endif %}
+
+      <div class="notif-verb">{{ n.verb }}</div>
+      <div class="notif-meta">{{ n.created_at|date:"M j \a\t H:i" }}</div>
+
+  {% if n.data.url %}
+    </a>
+  {% else %}
+    </div>
+  {% endif %}
+
+{% empty %}
+  <div class="notif-empty">No notifications</div>
+{% endfor %}

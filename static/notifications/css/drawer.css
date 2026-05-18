@@ -1,0 +1,131 @@
+/* ── Notification dropdown ─────────────────────────────────── */
+.notif-dropdown {
+  position: relative;
+}
+
+.notif-btn {
+  position: relative; /* <-- ADDED: anchors the absolute badge */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius);
+  border: 1.5px solid var(--border-dark);
+  background: var(--surface);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: background .15s, border-color .15s, color .15s, transform .15s;
+}
+
+.notif-btn:hover,
+.notif-btn:focus {
+  background: var(--orange-light);
+  border-color: var(--orange-border);
+  color: var(--orange);
+  transform: translateY(-1px);
+}
+
+.notif-badge {
+  display: none; /* JS will change this to inline-block when count > 0 */
+  position: absolute; /* <-- ADDED: pins it to the corner */
+  top: -6px;          /* <-- Adjust vertical offset */
+  right: -6px;        /* <-- Adjust horizontal offset */
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 16px;  /* Centers text vertically */
+  text-align: center; /* Centers text horizontally */
+  background: var(--red);
+  color: #fff;
+  box-sizing: border-box; 
+}
+
+.notif-dropdown.open .notif-badge {
+  box-shadow: 0 0 0 4px rgba(255,255,255,.12);
+}
+
+.notif-list {
+  position: absolute;
+  right: 0;
+  top: 46px;
+  width: 320px;
+  max-height: 420px;
+  overflow: hidden;
+  overflow-y: auto;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  z-index: 200;
+  display: none;
+}
+
+.notif-dropdown.open .notif-list {
+  display: block;
+}
+
+.notif-list-header {
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--border);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.notif-items {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+/* ── Individual Notification Items ── */
+
+.notif-item {
+  display: block; 
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--border);
+  border-left: 3px solid transparent; 
+  background-color: var(--surface);
+  transition: background-color 0.15s ease;
+}
+
+.notif-item:hover {
+  background-color: rgba(128, 128, 128, 0.12); 
+}
+
+/* ── Unread State Highlights ── */
+
+.notif-item.notif-unread {
+  border-left-color: var(--orange); 
+  background-color: var(--orange-light); 
+}
+
+.notif-item.notif-unread:hover {
+  background-color: var(--orange-border); 
+}
+
+.notif-item.notif-unread .notif-verb {
+  font-weight: 600;
+  color: var(--text);
+}
+
+.notif-verb {
+  font-size: 14px;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+
+.notif-meta {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.notif-empty {
+  padding: 18px 14px;
+  color: var(--text-muted);
+  font-size: 13px;
+}
