@@ -29,6 +29,7 @@ def thread_detail(request, thread_id):
     lost_found_context = None
     skill_exchange_context = None
     marketplace_context = None
+    ride_group_context = None
 
     if request.method == "POST":
         content = request.POST.get("content", "").strip()
@@ -60,7 +61,10 @@ def thread_detail(request, thread_id):
         base_template = "skill_exchange/base.html"
     elif hasattr(thread, "negotiation_thread"):
         marketplace_context = getattr(thread, "negotiation_thread")
-        base_template = "base.html"
+        base_template = "marketplace/base.html"
+    elif hasattr(thread, "ride_group"):
+        ride_group_context = getattr(thread, "ride_group")
+        base_template = "ride_share/base.html"
 
     context = {
         "thread": thread,
@@ -70,6 +74,7 @@ def thread_detail(request, thread_id):
         "lost_found_context": lost_found_context,
         "skill_exchange_context": skill_exchange_context,
         "marketplace_context": marketplace_context,
+        "ride_group_context": ride_group_context,
         "base_template": base_template,
     }
 

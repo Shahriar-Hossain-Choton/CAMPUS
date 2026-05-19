@@ -1,0 +1,94 @@
+{% extends "ride_share/base.html" %}
+
+{% block ride_content %}
+<div class="campus-header">
+  <div class="campus-header__row">
+    <div>
+      <h1>My Posts</h1>
+      <p>Manage all your ride posts in one place ~</p>
+    </div>
+    <a href="{% url 'ride_share:create_ride' %}" class="btn btn--primary">+ New Ride</a>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card__body">
+    {% if posts %}
+      <div style="display: grid; gap: 1rem;">
+        {% for post in posts %}
+          <div class="card ride-card" style="border: 1px solid var(--border);">
+            <div class="card__body">
+              <!-- Header with Status and Delete -->
+              <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+                <div>
+                  <span class="badge {% if post.status == 'open' %}badge--active{% else %}badge--muted{% endif %}">
+                    {{ post.get_status_display }}
+                  </span>
+                  <small style="color: var(--text-muted); margin-left: 8px;">Created {{ post.created_at|date:"M d, Y" }}</small>
+                </div>
+                <form method="POST" action="{% url 'ride_share:my_posts' %}" onsubmit="return confirm('Are you sure you want to delete this ride?');" style="display: inline;">
+                  {% csrf_token %}
+                  <input type="hidden" name="post_id" value="{{ post.id }}">
+                  <input type="hidden" name="action" value="delete">
+                  <button type="submit" class="btn btn--outline btn--sm" style="color: var(--red); border-color: var(--red-light);">Delete</button>
+                </form>
+              </div>
+
+              <!-- Route Info -->
+              <div style="background: var(--light-bg); padding: 12px; border-radius: 0.5rem; margin-bottom: 12px;">
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                  <div style="flex: 1;">
+                    <strong style="display: block; font-size: 0.9rem;">{{ post.starting_location }}</strong>
+                    <small style="color: var(--text-muted);">From</small>
+                  </div>
+                  <i class="fas fa-arrow-right" style="color: var(--primary);"></i>
+                  <div style="flex: 1;">
+                    <strong style="display: block; font-size: 0.9rem;">{{ post.destination_location }}</strong>
+                    <small style="color: var(--text-muted);">To</small>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Details Grid -->
+              <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid var(--border);">
+                <div>
+                  <small style="color: var(--text-muted); display: block;">Departure</small>
+                  <strong>{{ post.departure_time|date:"M d, H:i" }}</strong>
+                </div>
+                <div>
+                  <small style="color: var(--text-muted); display: block;">Transport</small>
+                  <strong>{{ post.get_transport_method_display }}</strong>
+                </div>
+                <div>
+                  <small style="color: var(--text-muted); display: block;">Members</small>
+                  <strong>{{ post.ride_group.current_occupancy }}/{{ post.max_capacity }}</strong>
+                </div>
+                <div>
+                  <small style="color: var(--text-muted); display: block;">Direction</small>
+                  <strong>{{ post.get_direction_display }}</strong>
+                </div>
+              </div>
+
+              <!-- Notes -->
+              {% if post.notes %}
+                <p style="font-size: 0.9rem; color: var(--text-muted); margin: 0 0 12px 0; line-height: 1.5; border-top: 1px solid var(--border); padding-top: 12px;">
+                  {{ post.notes }}
+                </p>
+              {% endif %}
+
+              <!-- View Details Button -->
+              <a href="{% url 'ride_share:ride_detail' post.id %}" class="btn btn--primary" style="width: 100%;">View Details & Members</a>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="sx-empty-state">
+        <p>You haven't posted any rides yet.</p>
+        <a href="{% url 'ride_share:create_ride' %}" class="btn btn--primary" style="margin-top: 16px;">Create your first ride</a>
+      </div>
+    {% endif %}
+  </div>
+</div>
+
+{% endblock %}

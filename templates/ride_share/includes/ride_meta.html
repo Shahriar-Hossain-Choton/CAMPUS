@@ -1,0 +1,29 @@
+{% comment %}Usage: include with `post` or `ride_post` and optional `group` (for occupancy)
+Provides small meta row with departure, transport, occupancy
+{% endcomment %}
+<div class="ride-meta">
+  <div class="detail-item">
+    <i class="fas fa-clock"></i>
+    <span>{% if post %}{{ post.departure_time|date:"M d, Y H:i" }}{% elif ride_post %}{{ ride_post.departure_time|date:"M d, Y H:i" }}{% endif %}</span>
+  </div>
+  <div class="detail-item">
+    <i class="fas fa-car"></i>
+    <span>{% if post %}{{ post.get_transport_method_display }}{% elif ride_post %}{{ ride_post.get_transport_method_display }}{% endif %}</span>
+  </div>
+  <div class="detail-item">
+    <i class="fas fa-users"></i>
+    <span>
+      {% if post and post.ride_group %}
+        {% include 'ride_share/includes/capacity.html' with group=post.ride_group %}
+      {% elif post %}
+        {% include 'ride_share/includes/capacity.html' with post=post %}
+      {% elif group %}
+        {% include 'ride_share/includes/capacity.html' with group=group %}
+      {% elif ride_post and ride_post.max_capacity %}
+        {{ ride_post.max_capacity }} seats
+      {% else %}
+        N/A
+      {% endif %}
+    </span>
+  </div>
+</div>

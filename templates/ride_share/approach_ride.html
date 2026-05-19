@@ -1,0 +1,103 @@
+{% extends 'ride_share/base.html' %}
+{% load static %}
+
+{% block title %}Join Ride - CAMPUS{% endblock %}
+
+{% block ride_content %}
+<div class="approach-ride-container">
+    <div class="approach-header">
+        <a href="{% url 'ride_share:ride_detail' ride_post.pk %}" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left"></i> Back to Ride
+        </a>
+        <h1>Join This Ride</h1>
+    </div>
+
+    <div class="approach-content">
+        <div class="ride-preview">
+            <h3>Ride Details</h3>
+            <div class="preview-card">
+                <div class="route-preview">
+                    <div class="location">
+                        <i class="fas fa-circle"></i>
+                        <strong>{{ ride_post.starting_location }}</strong>
+                    </div>
+                    <div class="arrow">
+                        <i class="fas fa-arrow-down"></i>
+                    </div>
+                    <div class="location">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <strong>{{ ride_post.destination_location }}</strong>
+                    </div>
+                </div>
+
+                <div class="details-grid">
+                    <div class="detail">
+                        <small>Departure Time</small>
+                        <p>{{ ride_post.departure_time|date:"M d, Y H:i" }}</p>
+                    </div>
+                    <div class="detail">
+                        <small>Vehicle Type</small>
+                        <p>{{ ride_post.get_transport_method_display }}</p>
+                    </div>
+                    <div class="detail">
+                        <small>Organizer</small>
+                        <p>{{ ride_post.user.get_full_name }}</p>
+                    </div>
+                </div>
+
+                {% if ride_post.notes %}
+                    <div class="notes-preview">
+                        <h5>Organizer's Notes</h5>
+                        <p>{{ ride_post.notes }}</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="join-form-section">
+            <h3>Join Details</h3>
+            <form method="post" class="join-form">
+                {% csrf_token %}
+
+                <div class="form-group">
+                    {{ form.party_size.label_tag }}
+                    {{ form.party_size }}
+                    {% if form.party_size.errors %}
+                        <div class="invalid-feedback d-block">
+                            {{ form.party_size.errors }}
+                        </div>
+                    {% endif %}
+                    <small class="form-text text-muted">How many people including you?</small>
+                </div>
+
+                <div class="form-group">
+                    {{ form.message.label_tag }}
+                    {{ form.message }}
+                    {% if form.message.errors %}
+                        <div class="invalid-feedback d-block">
+                            {{ form.message.errors }}
+                        </div>
+                    {% endif %}
+                    <small class="form-text text-muted">Optional: Introduce yourself or ask questions</small>
+                </div>
+
+                <div class="form-info">
+                    <div class="info-box">
+                        <i class="fas fa-info-circle"></i>
+                        <p>Your request will be sent to the organizer. After approval you'll be added to the ride and chat.</p>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        <i class="fas fa-check"></i> Request to Join
+                    </button>
+                    <a href="{% url 'ride_share:ride_detail' ride_post.pk %}" class="btn btn-secondary btn-lg">
+                        Cancel
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -32,6 +32,7 @@ urlpatterns = [
     path("skill-exchange/", include("apps.skill_exchange.urls")),
     path("notifications/", include("apps.notifications.urls")),
     path("marketplace/", include("apps.marketplace.urls")),
+    path("ride-share/", include("apps.ride_share.urls")),
 ]
 
 if settings.DEBUG:

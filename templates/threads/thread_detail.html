@@ -34,6 +34,9 @@
   {% include "marketplace/_negotiation_thread_context.html" with ctx=marketplace_context %}
 {% endif %}
 
+{% if ride_group_context %}
+  {% include "ride_share/_ride_thread_context.html" with ctx=ride_group_context %}
+{% endif %}
 
 {# ── Message feed ──────────────────────────────────────────── #}
 <div class="threads-message-list" id="message-list">

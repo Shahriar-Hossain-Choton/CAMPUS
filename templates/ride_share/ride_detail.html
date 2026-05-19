@@ -1,0 +1,127 @@
+{% extends 'ride_share/base.html' %}
+{% block title %}{{ ride_post.starting_location }} → {{ ride_post.destination_location }} - CAMPUS{% endblock %}
+
+{% block ride_content %}
+<div class="campus-wrap">
+
+  <div class="campus-header">
+    <div class="campus-header__row">
+      <div>
+        <span class="badge badge--{{ ride_post.status|lower }}">{{ ride_post.get_status_display }}</span>
+        <h1>{{ ride_post.starting_location }} → {{ ride_post.destination_location }}</h1>
+        <p>{{ ride_post.departure_time|date:"D, M d, Y · H:i" }}</p>
+      </div>
+      <a href="{% url 'ride_share:all_rides' %}" class="btn btn--outline btn--sm">← Back</a>
+    </div>
+  </div>
+
+  <div class="detail-grid">
+
+    <div>
+      <div class="section">
+        <p class="section__label"><i class="fas fa-map" style="color: var(--orange);"></i>Route</p>
+        <div class="card__body">
+          <p style="margin: 0;"><strong>Pickup:</strong> {{ ride_post.starting_location }}</p>
+          <p style="margin: 6px 0 0 0;"><strong>Destination:</strong> {{ ride_post.destination_location }}</p>
+        </div>
+      </div>
+
+      <div class="section">
+        <p class="section__label"><i class="fas fa-info-circle" style="color: var(--orange);"></i>Details</p>
+        <div class="detail-meta-list">
+          {% include 'ride_share/includes/ride_meta.html' with ride_post=ride_post group=ride_group %}
+          <p style="margin:6px 0;"><strong>Direction :</strong> {{ ride_post.get_direction_display }}</p>
+        </div>
+      </div>
+
+      <div class="section">
+        <p class="section__label"><i class="fas fa-chart-pie" style="color: var(--orange);"></i>Capacity</p>
+        <div style="margin-bottom: 8px; color: var(--text-muted);">{% include 'ride_share/includes/capacity.html' with group=ride_group %}</div>
+        <div style="height: 8px; background: var(--border); border-radius: var(--radius); overflow: hidden;">
+          <div style="height: 100%; width: {{ capacity_percent }}%; background: {{ capacity_color }}; transition: width .25s ease;"></div>
+        </div>
+      </div>
+
+      {% if ride_post.notes %}
+        <div class="section">
+          <p class="section__label"><i class="fas fa-sticky-note" style="color: var(--orange);"></i>Notes</p>
+          <p style="white-space: pre-wrap;">{{ ride_post.notes }}</p>
+        </div>
+      {% endif %}
+
+      <div class="section">
+        <p class="section__label"><i class="fas fa-users" style="color: var(--orange);"></i>Riders ({{ members|length }})</p>
+        <div class="detail-meta-list">
+          {% if ride_post.user == user and ride_group %}
+            {% comment %}Show pending join requests to organizer{% endcomment %}
+            {% if pending_requests %}
+              <div style="margin-bottom:12px;">
+                <strong>Pending Requests ({{ pending_requests|length }})</strong>
+                {% for req in pending_requests %}
+                    <div style="display:flex; align-items:center; gap:8px; margin-top:8px;">
+                      {% include 'ride_share/includes/member_avatar.html' with user=req.user size=36 %}
+                      <div style="flex:1;">
+                        <div style="font-weight:600;">{{ req.user.get_full_name }}</div>
+                        <div style="color:var(--text-muted); font-size:13px;">Party of {{ req.party_size }} · Requested {{ req.joined_at|timesince }} ago</div>
+                      </div>
+                      <form method="post" action="{% url 'ride_share:approve_request' ride_post.pk req.pk %}" style="display:inline; margin-right:6px;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn--sm btn--primary">Approve</button>
+                      </form>
+                      <form method="post" action="{% url 'ride_share:reject_request' ride_post.pk req.pk %}" style="display:inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn--sm btn--outline">Reject</button>
+                      </form>
+                    </div>
+                  {% endfor %}
+                </div>
+              {% endif %}
+          {% endif %}
+          {% for member in members %}
+            <div class="detail-meta-row">
+              <dt style="width: 120px;">
+                <div>
+                  {% include 'ride_share/includes/member_avatar.html' with user=member.user size=44 %}
+                </div>
+              </dt>
+              <dd>
+                <div style="font-weight:600;">{{ member.user.get_full_name }} {% if member.is_initiator %}<span class="badge badge--active" style="margin-left:8px;">Organizer</span>{% endif %}</div>
+                <div style="color:var(--text-muted); font-size:13px;">Party of {{ member.party_size }} · Joined {{ member.joined_at|timesince }} ago</div>
+              </dd>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+
+    </div>
+
+    <div>
+      <div class="card">
+        <div style="display:flex; flex-direction:column; gap:8px;">
+          {% if user_is_member %}
+            <a href="{% url 'ride_share:ride_chat' ride_post.pk %}" class="btn btn--primary">View Chat</a>
+            <form method="post" action="{% url 'ride_share:leave_ride' ride_post.pk %}" onsubmit="return confirm('Are you sure you want to leave this ride?');">
+              {% csrf_token %}
+              <button type="submit" class="btn btn--outline">Leave Ride</button>
+            </form>
+          {% elif ride_post.user == user %}
+            {% if ride_group.status == 'forming' %}
+              <form method="post" action="{% url 'ride_share:start_ride' ride_post.pk %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn--primary" style="background:var(--green); border-color:var(--green);">Start Ride</button>
+              </form>
+            {% endif %}
+            <a href="{% url 'ride_share:ride_chat' ride_post.pk %}" class="btn btn--primary">Manage Chat</a>
+          {% elif not is_full %}
+            <a href="{% url 'ride_share:approach_ride' ride_post.pk %}" class="btn btn--primary">Join This Ride</a>
+          {% else %}
+            <button class="btn btn--ghost" disabled>Ride is Full</button>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+{% endblock %}

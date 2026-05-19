@@ -53,8 +53,8 @@
           </a>
         </li>
         <li>
-          <a href="#"
-             {% if request.resolver_match.app_name == 'rideshare' %}class="active"{% endif %}>
+          <a href="{% url 'ride_share:all_rides' %}"
+             {% if request.resolver_match.app_name == 'ride_share' %}class="active"{% endif %}>
             Ride Share
           </a>
         </li>

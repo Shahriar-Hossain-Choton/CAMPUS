@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Ride Share - CAMPUS{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'ride_share/css/ride_share.css' %}">
+{% endblock %}
+
+{% block subnav %}
+<div class="campus-subnav">
+  <div class="campus-subnav__inner">
+    <a href="{% url 'ride_share:all_rides' %}" class="{% if request.resolver_match.url_name == 'all_rides' %}active{% endif %}">
+        All Posts
+    </a>
+    <a href="{% url 'ride_share:my_posts' %}" class="{% if request.resolver_match.url_name == 'my_posts' %}active{% endif %}">
+        My Posts
+    </a>
+    <a href="{% url 'ride_share:my_matches' %}" class="{% if request.resolver_match.url_name == 'my_matches' %}active{% endif %}">
+        Matches
+    </a>
+    <div class="subnav-divider"></div>
+    <a href="{% url 'ride_share:create_ride' %}" class="{% if request.resolver_match.url_name == 'create_ride' %}active{% endif %}">
+        + Create Ride
+    </a>
+  </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="ride-share-container">
+    {% block ride_content %}{% endblock %}
+</div>
+{% endblock %}

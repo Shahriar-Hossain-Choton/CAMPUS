@@ -1,0 +1,10 @@
+{# Usage: include with `user` and optional `size` (px) #}
+{% with s=size|default:40 %}
+  {% if user.profile.photo %}
+    <img src="{{ user.profile.photo.file.url }}" alt="{{ user.get_full_name }}" style="width: {{ s }}px; height: {{ s }}px; border-radius: 50%; object-fit: cover;">
+  {% else %}
+    <div style="width: {{ s }}px; height: {{ s }}px; border-radius: 50%; background: var(--border); display: flex; align-items: center; justify-content: center; font-weight: 600; color: white;">
+      {{ user.first_name|first|upper }}
+    </div>
+  {% endif %}
+{% endwith %}
