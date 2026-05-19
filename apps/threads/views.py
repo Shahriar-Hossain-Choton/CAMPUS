@@ -56,6 +56,9 @@ def thread_detail(request, thread_id):
     elif hasattr(thread, "exchange_session"):
         skill_exchange_context = getattr(thread, "exchange_session")
         base_template = "skill_exchange/base.html"
+    elif hasattr(thread, "ride_group"):
+        ride_group_context = getattr(thread, "ride_group")
+        base_template = "ride_share/base.html"
 
     context = {
         "thread": thread,
@@ -64,6 +67,7 @@ def thread_detail(request, thread_id):
         .order_by("sent_at"),
         "lost_found_context": lost_found_context,
         "skill_exchange_context": skill_exchange_context,
+        "ride_group_context": ride_group_context,
         "base_template": base_template,
     }
 

@@ -118,3 +118,42 @@ class ProfileStatus(models.TextChoices):
     NORMAL = "normal", "Normal"
     FLAGGED = "flagged", "Flagged"
     SUSPENDED = "suspended", "Suspended"
+
+# Ride Sharing domain status and choices
+class TransportMethod(models.TextChoices):
+    CAR = "car", "Car"
+    RICKSHAW = "rickshaw", "Rickshaw"
+    CNG = "cng", "CNG"
+    MICROBUS = "microbus", "MICROBUS"
+
+TRANSPORT_CAPACITY = {
+    TransportMethod.RICKSHAW: 2,
+    TransportMethod.CNG:      3,
+    TransportMethod.CAR:      4,
+}
+
+class RidePostStatus(models.TextChoices):
+    OPEN = "open", "Open"
+    CLOSED = "closed", "Closed"
+    CANCELLED = "cancelled", "Cancelled"
+
+
+class RideJoinRequestStatus(models.TextChoices):
+    PENDING = "pending", "Pending"
+    ACCEPTED = "accepted", "Accepted"
+    REJECTED = "rejected", "Rejected"
+
+
+class RideGroupStatus(models.TextChoices):
+    FORMING = "forming", "Forming"
+    CONFIRMED = "confirmed", "Confirmed"
+    IN_TRANSIT = "in_transit", "In Transit"
+    COMPLETED = "completed", "Completed"
+    CANCELLED = "cancelled", "Cancelled"
+
+
+class RideGroupMemberStatus(models.TextChoices):
+    PENDING = "pending", "Pending"
+    CONFIRMED = "confirmed", "Confirmed"
+    LEFT = "left", "Left"
+    NO_SHOW = "no_show", "No Show"
