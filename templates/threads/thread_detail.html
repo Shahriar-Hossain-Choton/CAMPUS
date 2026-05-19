@@ -30,6 +30,11 @@
   {% include "skill_exchange/_session_thread_context.html" with ctx=skill_exchange_context %}
 {% endif %}
 
+{% if marketplace_context %}
+  {% include "marketplace/_negotiation_thread_context.html" with ctx=marketplace_context %}
+{% endif %}
+
+
 {# ── Message feed ──────────────────────────────────────────── #}
 <div class="threads-message-list" id="message-list">
 

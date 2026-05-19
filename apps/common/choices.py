@@ -118,3 +118,9 @@ class ProfileStatus(models.TextChoices):
     NORMAL = "normal", "Normal"
     FLAGGED = "flagged", "Flagged"
     SUSPENDED = "suspended", "Suspended"
+
+# marketplace listiong status
+class ListingStatus(models.TextChoices):
+    ACTIVE    = "ACTIVE",    "Active"
+    SOLD      = "SOLD",      "Sold"
+    ARCHIVED  = "ARCHIVED",  "Archived"
