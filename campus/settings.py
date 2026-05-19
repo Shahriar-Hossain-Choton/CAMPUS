@@ -39,6 +39,7 @@ ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "0.0.0.0").split(",")
 # Application definition
 
 INSTALLED_APPS = [
+    "apps.ride_share.apps.RideShareConfig",
     "apps.rankings.apps.RankingsConfig",
     "apps.accounts.apps.AccountsConfig",
     "apps.media.apps.MediaConfig",

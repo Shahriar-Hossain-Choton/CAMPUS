@@ -1,0 +1,141 @@
+{% extends "ride_share/base.html" %}
+
+{% block ride_content %}
+<div class="campus-header">
+  <div class="campus-header__row">
+    <div>
+      <h1>All Rides</h1>
+      <p>Find and join rides heading to your destination ~</p>
+    </div>
+  </div>
+</div>
+
+<!-- Filters -->
+<div class="card" style="margin-bottom: 2rem;">
+  <div class="card__body">
+    <form method="get" class="ride-filters-form">
+      <div style="display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 1rem; align-items: end;">
+        <div>
+          <label for="direction" style="display: block; font-weight: 600; margin-bottom: 0.5rem; font-size: 0.9rem;">Direction</label>
+          <select name="direction" id="direction" class="form-control">
+            <option value="">All Directions</option>
+            {% for value, label in directions %}
+              <option value="{{ value }}" {% if selected_direction == value %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div>
+          <label for="transport" style="display: block; font-weight: 600; margin-bottom: 0.5rem; font-size: 0.9rem;">Transport</label>
+          <select name="transport" id="transport" class="form-control">
+            <option value="">All Types</option>
+            {% for value, label in transports %}
+              <option value="{{ value }}" {% if selected_transport == value %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div>
+          <label for="location" style="display: block; font-weight: 600; margin-bottom: 0.5rem; font-size: 0.9rem;">Location</label>
+          <input type="text" name="location" id="location" class="form-control" placeholder="Search location..." value="{{ selected_location }}">
+        </div>
+        <div>
+          <button type="submit" class="btn btn--primary">Filter</button>
+          <a href="{% url 'ride_share:all_rides' %}" class="btn btn--outline" style="margin-left: 0.5rem;">Clear</a>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Rides Grid -->
+<div class="card">
+  <div class="card__body">
+    {% if posts %}
+      <div style="display: grid; gap: 1rem;">
+        {% for post in posts %}
+          <div class="card ride-card" style="border: 1px solid var(--border);">
+            <div class="card__body">
+              <!-- Header -->
+              <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                  {% if post.user.profile.photo.file %}
+                    <img src="{{ post.user.profile.photo.file.url }}" alt="{{ post.user.email }}" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover;">
+                  {% else %}
+                    <div style="width: 40px; height: 40px; border-radius: 50%; background: var(--border); display: flex; align-items: center; justify-content: center; font-weight: 600; color: white;">
+                      {{ post.user.email|first|upper }}
+                    </div>
+                  {% endif %}
+                  <div>
+                    <strong>{{ post.user.profile.handle }}</strong>
+                    <small style="display: block; color: var(--text-muted);">{{ post.created_at|date:"M d, Y H:i" }}</small>
+                  </div>
+                </div>
+                <span class="badge {% if post.status == 'open' %}badge--active{% else %}badge--muted{% endif %}">
+                  {{ post.get_status_display }}
+                </span>
+              </div>
+
+              <!-- Route Info -->
+              <div style="background: var(--light-bg); padding: 12px; border-radius: 0.5rem; margin-bottom: 12px;">
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                  <div style="flex: 1;">
+                    <strong style="display: block; font-size: 0.9rem;">{{ post.starting_location }}</strong>
+                    <small style="color: var(--text-muted);">Pickup</small>
+                  </div>
+                  <i class="fas fa-arrow-right" style="color: var(--primary);" ></i>
+                  <div style="flex: 1;">
+                    <strong style="display: block; font-size: 0.9rem;">{{ post.destination_location }}</strong>
+                    <small style="color: var(--text-muted);">Destination</small>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Details Grid -->
+              <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid var(--border);">
+                <div>
+                  <small style="color: var(--text-muted); display: block;">Time</small>
+                  <strong>{{ post.departure_time|date:"H:i" }}</strong>
+                </div>
+                <div>
+                  <small style="color: var(--text-muted); display: block;">Transport</small>
+                  <strong>{{ post.get_transport_method_display }}</strong>
+                </div>
+                <div>
+                  <small style="color: var(--text-muted); display: block;">Seats</small>
+                  <strong>
+                    {% if post.ride_group %}
+                      {% include 'ride_share/includes/capacity.html' with group=post.ride_group %}
+                    {% else %}
+                      {% include 'ride_share/includes/capacity.html' with post=post %}
+                    {% endif %}
+                  </strong>
+                </div>
+              </div>
+
+              <!-- Direction -->
+              <div style="display: flex; gap: 0.5rem; margin-bottom: 12px;">
+                <span class="badge">{{ post.get_direction_display }}</span>
+              </div>
+
+              <!-- Notes -->
+              {% if post.notes %}
+                <p style="font-size: 0.9rem; color: var(--text-muted); margin: 0 0 12px 0; line-height: 1.5;">
+                  {{ post.notes|truncatewords:30 }}
+                </p>
+              {% endif %}
+
+              <!-- Action Button -->
+              <a href="{% url 'ride_share:ride_detail' post.id %}" class="btn btn--primary" style="width: 100%;">View Details</a>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="sx-empty-state">
+        <p>No rides available matching your filters.</p>
+        <a href="{% url 'ride_share:create_ride' %}" class="btn btn--primary" style="margin-top: 16px;">Create your first ride</a>
+      </div>
+    {% endif %}
+  </div>
+</div>
+
+{% endblock %}

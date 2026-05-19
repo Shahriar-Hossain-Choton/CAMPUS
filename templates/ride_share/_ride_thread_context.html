@@ -1,0 +1,41 @@
+<div class="card shadow-sm mb-4">
+  <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
+    <div>
+      <h6 class="mb-1 text-dark">Ride Group Details</h6>
+      <div class="small">
+        <span class="badge badge-{{ ctx.ride_group.status|lower }} mr-2">{{ ctx.ride_group.get_status_display }}</span>
+        <span class="text-muted">{{ ctx.ride_group.ride_post.starting_location }} &rarr; {{ ctx.ride_group.ride_post.destination_location }}</span>
+      </div>
+    </div>
+    <a href="{% url 'ride_share:ride_detail' pk=ctx.ride_group.ride_post.id %}" class="btn btn-outline-primary btn-sm">
+      View Details
+    </a>
+  </div>
+
+  <div class="card-body">
+    <div class="row text-sm mb-3 text-muted">
+      <div class="col-12">
+        {% include 'ride_share/includes/ride_meta.html' with ride_post=ctx.ride_group.ride_post group=ctx.ride_group %}
+      </div>
+    </div>
+
+    {% if ctx.ride_group.ride_post.notes %}
+      <div class="alert alert-light border py-2 mb-3 small">
+        <strong>Notes:</strong> {{ ctx.ride_group.ride_post.notes }}
+      </div>
+    {% endif %}
+
+    <div class="mt-3">
+      <p class="font-weight-bold text-sm mb-2">Members ({{ ctx.members.count }})</p>
+      <div class="d-flex flex-wrap" style="gap: 10px;">
+        {% for member in ctx.members %}
+          <div class="badge badge-light border py-1 px-2 d-flex align-items-center">
+            {% include 'ride_share/includes/member_avatar.html' with user=member.user size=20 %}
+            <span class="text-dark font-weight-normal" style="margin-left:8px;">{{ member.user.get_full_name|default:member.user.email }}</span>
+            {% if member.is_initiator %}<span class="badge badge-primary ml-2">Organizer</span>{% endif %}
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>

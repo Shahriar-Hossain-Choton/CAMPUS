@@ -1,0 +1,35 @@
+{# Usage: include with `current` and `max` or with `group` or `post` #}
+{% if group %}
+  {% with current=group.current_occupancy max=group.max_capacity %}
+    <span class="capacity-text">{{ current }}/{{ max }} seats</span>
+    {% if max|default:0 > 0 %}
+      <div style="height:8px; background: var(--border); border-radius:4px; overflow:hidden; margin-top:6px;">
+        <div style="height:100%; width:{% widthratio current max 100 %}%; background: var(--primary);"></div>
+      </div>
+    {% endif %}
+  {% endwith %}
+{% elif post %}
+  {% if post.ride_group %}
+    {% with current=post.ride_group.current_occupancy max=post.ride_group.max_capacity %}
+      <span class="capacity-text">{{ current }}/{{ max }} seats</span>
+      {% if max|default:0 > 0 %}
+        <div style="height:8px; background: var(--border); border-radius:4px; overflow:hidden; margin-top:6px;">
+          <div style="height:100%; width:{% widthratio current max 100 %}%; background: var(--primary);"></div>
+        </div>
+      {% endif %}
+    {% endwith %}
+  {% else %}
+    {% with current=0 max=post.max_capacity %}
+      <span class="capacity-text">{{ current }}/{{ max }} seats</span>
+      {% if max|default:0 > 0 %}
+        <div style="height:8px; background: var(--border); border-radius:4px; overflow:hidden; margin-top:6px;">
+          <div style="height:100%; width:{% widthratio current max 100 %}%; background: var(--primary);"></div>
+        </div>
+      {% endif %}
+    {% endwith %}
+  {% endif %}
+{% else %}
+  {% with current=0 max=0 %}
+    <span class="capacity-text">{{ current }}/{{ max }} seats</span>
+  {% endwith %}
+{% endif %}
